@@ -22,20 +22,47 @@ namespace SalesWebMvc.Services
             return _context.Seller.ToList();
         }
 
+        public async Task<List<Seller>> FindAllAsync()
+        {
+            return await _context.Seller.ToListAsync();
+        }
+
         public void Insert(Seller seller)
         {
             _context.Seller.Add(seller);
             _context.SaveChanges();
         }
 
+        public async Task InsertAsync(Seller seller)
+        {
+            _context.Seller.Add(seller);
+            await _context.SaveChangesAsync();
+        }
+
         public Seller FindById(int id)
         {
-            return _context.Seller.FirstOrDefault(p => p.Id == id);
+            return _context.Seller
+                           .FirstOrDefault(p => p.Id == id);
+        }
+
+        public async Task<Seller> FindByIdAsync(int id)
+        {
+            return await _context.Seller
+                                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public Seller FindByIdWithDepartment(int id)
         {
-            return _context.Seller.Include(p => p.Department).FirstOrDefault(p => p.Id == id);
+            return _context.Seller
+                           .Include(p => p.Department)
+                           .FirstOrDefault(p => p.Id == id);
+        }
+
+        public async Task<Seller> FindByIdWithDepartmentAsync(int id)
+        {
+            return await _context.Seller
+                                 .Include(p => p.Department)
+                                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public void Remove(int id)
@@ -45,9 +72,18 @@ namespace SalesWebMvc.Services
             _context.SaveChanges();
         }
 
+        public async Task RemoveAsync(int id)
+        {
+            var seller = await FindByIdAsync(id);
+            _context.Seller.Remove(seller);
+            await _context.SaveChangesAsync();
+        }
+
         public void Update(Seller seller)
         {
-            if (!_context.Seller.Any(p => p.Id == seller.Id))
+            bool hasAny = _context.Seller.Any(p => p.Id == seller.Id);
+
+            if (!hasAny)
             {
                 throw new NotFoundException("Id not fount.");
             }
@@ -62,6 +98,27 @@ namespace SalesWebMvc.Services
                 throw new DbConcurrenceException(e.Message);
             }
             
+        }
+
+        public async Task UpdateAsync(Seller seller)
+        {
+            bool hasAny = await _context.Seller.AnyAsync(p => p.Id == seller.Id);
+
+            if (!hasAny)
+            {
+                throw new NotFoundException("Id not fount.");
+            }
+
+            try
+            {
+                _context.Update(seller);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException e)
+            {
+                throw new DbConcurrenceException(e.Message);
+            }
+
         }
     }
 }
