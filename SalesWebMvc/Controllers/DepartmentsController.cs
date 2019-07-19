@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DevExtreme.AspNet.Data;
+using DevExtreme.AspNet.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SalesWebMvc.Models;
+using SalesWebMvc.Models.Extensions;
 
 namespace SalesWebMvc.Controllers
 {
@@ -18,10 +22,47 @@ namespace SalesWebMvc.Controllers
             _context = context;
         }
 
-        // GET: Departments
         public async Task<IActionResult> Index()
         {
             return View(await _context.Department.ToListAsync());
+        }
+
+        public IActionResult GridView()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public object GetDepartments(DataSourceLoadOptions loadOptions)
+        {
+            var departments = _context.Department.ToList();
+            return DataSourceLoader.Load(departments, loadOptions);
+        }
+
+        [HttpPut]
+        public IActionResult EditDepartment(int key, string values)
+        {
+            if (!ModelState.IsValid)
+            {                
+                return View();
+            }
+            
+            try
+            {
+                var department = _context.Department.First(p => p.Id == key);
+                JsonConvert.PopulateObject(values, department);
+
+                if (!TryValidateModel(department))
+                    return BadRequest(ModelState.GetFullErrorMessage());
+
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            catch (ApplicationException e)
+            {
+                return BadRequest(e);
+            }            
         }
 
         // GET: Departments/Details/5
@@ -147,6 +188,6 @@ namespace SalesWebMvc.Controllers
         private bool DepartmentExists(int id)
         {
             return _context.Department.Any(e => e.Id == id);
-        }
+        }        
     }
 }

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +9,8 @@ using SalesWebMvc.Models;
 using SalesWebMvc.Services;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SalesWebMvc
 {
@@ -37,7 +34,10 @@ namespace SalesWebMvc
             });
 
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services
+                .AddMvc()
+                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddDbContext<SalesWebMvcContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("SalesWebMvcContext"),
@@ -66,6 +66,7 @@ namespace SalesWebMvc
 
             if (env.IsDevelopment())
             {
+                app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
                 seedingService.Seed();
             }

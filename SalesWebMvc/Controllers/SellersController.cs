@@ -7,6 +7,8 @@ using SalesWebMvc.Models;
 using SalesWebMvc.Models.ViewModels;
 using SalesWebMvc.Services;
 using SalesWebMvc.Services.Exceptions;
+using DevExtreme.AspNet.Data;
+using DevExtreme.AspNet.Mvc;
 
 namespace SalesWebMvc.Controllers
 {
@@ -37,7 +39,7 @@ namespace SalesWebMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Seller seller)
+        public async Task<IActionResult> CreateSeller(Seller seller)
         {
             if (!ModelState.IsValid)
             {

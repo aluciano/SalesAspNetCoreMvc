@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Departments</h2>
+
+@(Html.DevExtreme().DataGrid<Department>()
+    .ShowBorders(true)
+    .DataSource(d => d.Mvc()
+                      .Controller("Departments")
+                      .LoadAction("GetDepartments")
+                      .UpdateAction("EditDepartment")
+                      .Key("Id"))
+    .Columns(columns =>
+    {
+        columns.AddFor(m => m.Id)
+                    .Width(50)
+                    .Alignment(HorizontalAlignment.Left);
+        columns.AddFor(m => m.Name).Width(300);
+        columns.Add()
+            .Type(GridCommandColumnType.Buttons)
+            .Width(110)
+            .Caption("Actions")
+            .Buttons(b =>
+            {
+                b.Add().Name(GridColumnButtonName.Edit);
+                b.Add().Name(GridColumnButtonName.Delete);
+            });
+    })
+    .Paging(p => p.PageSize(10))
+    .HeaderFilter(f => f.Visible(true))
+    .FilterRow(f => f.Visible(true))
+    .RemoteOperations(true)
+    .Editing(e => e.Mode(GridEditMode.Popup)
+           //.UseIcons(true)
+           .AllowUpdating(true)
+           .Popup(p => p
+                .Title("Department Info")
+                .ShowTitle(true)
+                .Width(700)
+                .Height(525)
+                .Position(pos => pos
+                    .My(HorizontalAlignment.Center, VerticalAlignment.Top)
+                    .At(HorizontalAlignment.Center, VerticalAlignment.Top)
+                    .Of(new JS("window"))
+                )
+           )
+           .Form(f => f.Items(items => {
+               items.AddGroup()
+                   .ColCount(2)
+                   .ColSpan(2)
+                   .Items(groupItems => {
+                       groupItems.AddSimpleFor(m => m.Name);
+                   });
+           }))
+        )
+)
+
+<hr />
+<a asp-action="Index">Table CRUD</a>

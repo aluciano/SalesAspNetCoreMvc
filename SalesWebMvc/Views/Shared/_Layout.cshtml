@@ -3,6 +3,36 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    @*<link href="~/css/devextreme/bootstrap.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" />*@
+    <link href="~/css/devextreme/dx.common.css" rel="stylesheet" />
+    <link href="~/css/devextreme/dx.light.css" rel="stylesheet" />
+
+    <script src="~/js/devextreme/jquery.js"></script>
+    <script src="~/js/devextreme/bootstrap.js"></script>
+
+    <script src="~/js/devextreme/cldr.js"></script>
+    <script src="~/js/devextreme/cldr/event.js"></script>
+    <script src="~/js/devextreme/cldr/supplemental.js"></script>
+    <script src="~/js/devextreme/cldr/unresolved.js"></script>
+
+    <script src="~/js/devextreme/globalize.js"></script>
+    <script src="~/js/devextreme/globalize/message.js"></script>
+    <script src="~/js/devextreme/globalize/number.js"></script>
+    <script src="~/js/devextreme/globalize/currency.js"></script>
+    <script src="~/js/devextreme/globalize/date.js"></script>
+
+    <script src="~/js/devextreme/dx.all.js"></script>
+    <script src="~/js/devextreme/vectormap-data/world.js"></script>
+    <script src="~/js/devextreme/aspnet/dx.aspnet.data.js"></script>
+    <script src="~/js/devextreme/aspnet/dx.aspnet.mvc.js"></script>
+
     <title>@ViewData["Title"] - SalesWebMvc</title>
 
     <environment include="Development">
@@ -31,7 +61,7 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Departments" asp-action="Index">Departments</a></li>
+                    <li><a asp-area="" asp-controller="Departments" asp-action="GridView">Departments</a></li>
                     <li><a asp-area="" asp-controller="Sellers" asp-action="Index">Sellers</a></li>
                     <li><a asp-area="" asp-controller="SalesRecords" asp-action="Index">Sales</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
