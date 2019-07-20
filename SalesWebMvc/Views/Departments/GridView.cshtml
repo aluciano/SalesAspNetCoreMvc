@@ -9,52 +9,77 @@
     .DataSource(d => d.Mvc()
                       .Controller("Departments")
                       .LoadAction("GetDepartments")
+                      .InsertAction("InsertDepartment")
                       .UpdateAction("EditDepartment")
+                      .DeleteAction("DeleteDepartment")
                       .Key("Id"))
     .Columns(columns =>
     {
         columns.AddFor(m => m.Id)
                     .Width(50)
                     .Alignment(HorizontalAlignment.Left);
-        columns.AddFor(m => m.Name).Width(300);
+        columns.AddFor(m => m.Name)
+               .Width(300)
+               .AllowEditing(true);
         columns.Add()
             .Type(GridCommandColumnType.Buttons)
-            .Width(110)
-            .Caption("Actions")
+            .Width(150)
+            .Caption("DevExpress Actions")
             .Buttons(b =>
             {
-                b.Add().Name(GridColumnButtonName.Edit);
-                b.Add().Name(GridColumnButtonName.Delete);
+                b.Add().Name(GridColumnButtonName.Edit).Text("Edit");
+                b.Add().Name(GridColumnButtonName.Delete).Text("Delete");
+            });
+        columns.Add()
+            .Type(GridCommandColumnType.Buttons)
+            .Caption("Table Actions")
+            .Width(150)
+            .Buttons(b =>
+            {
+                b.Add().Template(@<text>
+
+                        <a href="@Url.Action("Edit", "Departments")/<%= data.Id %>">Edit</a>
+
+                        <a href="@Url.Action("Delete", "Departments")/<%= data.Id %>">Delete</a>
+
+                        <a href="@Url.Action("Details", "Departments")/<%= data.Id %>">Details</a>
+
+                </text>);
             });
     })
     .Paging(p => p.PageSize(10))
     .HeaderFilter(f => f.Visible(true))
     .FilterRow(f => f.Visible(true))
     .RemoteOperations(true)
-    .Editing(e => e.Mode(GridEditMode.Popup)
-           //.UseIcons(true)
-           .AllowUpdating(true)
-           .Popup(p => p
-                .Title("Department Info")
-                .ShowTitle(true)
-                .Width(700)
-                .Height(525)
-                .Position(pos => pos
-                    .My(HorizontalAlignment.Center, VerticalAlignment.Top)
-                    .At(HorizontalAlignment.Center, VerticalAlignment.Top)
-                    .Of(new JS("window"))
-                )
-           )
-           .Form(f => f.Items(items => {
-               items.AddGroup()
-                   .ColCount(2)
-                   .ColSpan(2)
-                   .Items(groupItems => {
-                       groupItems.AddSimpleFor(m => m.Name);
-                   });
-           }))
+    //.Selection(s => s.Mode(SelectionMode.Single))
+    .RowAlternationEnabled(true)
+    .HoverStateEnabled(true)
+    .Editing(e => e
+        .Mode(GridEditMode.Popup)
+        .AllowAdding(true)    
+        .AllowUpdating(true)
+        .AllowDeleting(true)        
+        .Popup(p => p
+            .Title("Department Info")
+            .ShowTitle(true)
+            .Width(700)
+            .Height(525)
+            .Position(pos => pos
+                .My(HorizontalAlignment.Center, VerticalAlignment.Top)
+                .At(HorizontalAlignment.Center, VerticalAlignment.Top)
+                .Of(new JS("window"))
+            )
         )
+        .Form(f => f.Items(items => {
+            items.AddGroup()
+                .ColCount(2)
+                .ColSpan(2)
+                .Items(groupItems => {
+                    groupItems.AddSimpleFor(m => m.Name);
+                });
+        }))
+    )
 )
 
-<hr />
-<a asp-action="Index">Table CRUD</a>
+<br>
+<a asp-action="Index">Back to Table List</a>
