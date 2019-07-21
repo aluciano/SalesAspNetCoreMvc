@@ -8,21 +8,24 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SalesWebMvc.Models;
 using SalesWebMvc.Models.Extensions;
+using SalesWebMvc.Services;
 
 namespace SalesWebMvc.Controllers
 {
     public class DepartmentsController : Controller
     {
-        private readonly SalesWebMvcContext _context;
+        private readonly DepartmentService _departmentService;
 
-        public DepartmentsController(SalesWebMvcContext context)
+        public DepartmentsController(DepartmentService departmentService)
         {
-            _context = context;
+            _departmentService = departmentService;
         }
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Department.ToListAsync());
+            var departments = await _departmentService.FindAllWebApiAsync();
+
+            return View(departments);
         }
 
         public IActionResult GridView()
@@ -31,10 +34,13 @@ namespace SalesWebMvc.Controllers
         }
 
         [HttpGet]
-        public object GetDepartments(DataSourceLoadOptions loadOptions)
+        public async Task<object> GetDepartments(DataSourceLoadOptions loadOptions)
         {
-            var departments = _context.Department.ToList();
-            return DataSourceLoader.Load(departments, loadOptions);
+            var departments = await _departmentService.FindAllWebApiAsync();
+
+            object result = await Task.Run(() => DataSourceLoader.Load(departments, loadOptions));
+
+            return result;
         }
 
         [HttpPut]
@@ -42,42 +48,44 @@ namespace SalesWebMvc.Controllers
         {
             try
             {
-                var department = _context.Department.First(p => p.Id == key);
-                JsonConvert.PopulateObject(values, department);
-
-                if (!TryValidateModel(department))
-                    return BadRequest(ModelState.GetFullErrorMessage());
-
-                await _context.SaveChangesAsync();
+                await _departmentService.UpdateAsync(key, values);
 
                 return Ok();
             }
             catch (ApplicationException e)
             {
                 return BadRequest(e);
-            }            
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> InsertDepartment(string values)
         {
-            var department = new Department();
-            JsonConvert.PopulateObject(values, department);
+            try
+            {
+                await _departmentService.InsertAsync(values);
 
-            if (!TryValidateModel(department))
-                return BadRequest(ModelState.GetFullErrorMessage());
-
-            _context.Department.Add(department);
-            await _context.SaveChangesAsync();
-            return Ok();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
         }
 
         [HttpDelete]
-        public async Task DeleteDepartment(int key)
+        public async Task<IActionResult> DeleteDepartment(int key)
         {
-            var department = _context.Department.Find(key);
-            _context.Department.Remove(department);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _departmentService.DeleteAsync(key);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -87,8 +95,8 @@ namespace SalesWebMvc.Controllers
                 return NotFound();
             }
 
-            var department = await _context.Department
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var department = await _departmentService.FindByIdAsync(id.Value);
+
             if (department == null)
             {
                 return NotFound();
@@ -108,8 +116,9 @@ namespace SalesWebMvc.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(department);
-                await _context.SaveChangesAsync();
+                string jsonValues = JsonConvert.SerializeObject(department);
+                await _departmentService.InsertAsync(jsonValues);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(department);
@@ -122,7 +131,8 @@ namespace SalesWebMvc.Controllers
                 return NotFound();
             }
 
-            var department = await _context.Department.FindAsync(id);
+            var department = await _departmentService.FindByIdAsync(id.Value);
+
             if (department == null)
             {
                 return NotFound();
@@ -130,9 +140,6 @@ namespace SalesWebMvc.Controllers
             return View(department);
         }
 
-        // POST: Departments/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Department department)
@@ -146,12 +153,12 @@ namespace SalesWebMvc.Controllers
             {
                 try
                 {
-                    _context.Update(department);
-                    await _context.SaveChangesAsync();
+                    string jsonValues = JsonConvert.SerializeObject(department);
+                    await _departmentService.UpdateAsync(id, jsonValues);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DepartmentExists(department.Id))
+                    if (!await DepartmentExists(department.Id))
                     {
                         return NotFound();
                     }
@@ -165,6 +172,12 @@ namespace SalesWebMvc.Controllers
             return View(department);
         }
 
+        private async Task<bool> DepartmentExists(int id)
+        {
+            var department = await _departmentService.FindByIdAsync(id);
+            return department == null ? false : true;
+        }
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -172,8 +185,8 @@ namespace SalesWebMvc.Controllers
                 return NotFound();
             }
 
-            var department = await _context.Department
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var department = await _departmentService.FindByIdAsync(id.Value);
+
             if (department == null)
             {
                 return NotFound();
@@ -186,15 +199,10 @@ namespace SalesWebMvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var department = await _context.Department.FindAsync(id);
-            _context.Department.Remove(department);
-            await _context.SaveChangesAsync();
+            await _departmentService.DeleteAsync(id);
+
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DepartmentExists(int id)
-        {
-            return _context.Department.Any(e => e.Id == id);
-        }        
     }
 }

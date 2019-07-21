@@ -32,7 +32,7 @@ namespace SalesWebMvc.Controllers
 
         public async Task<IActionResult> Create()
         {
-            var departments = await _departmentService.FindAllAsync();
+            var departments = await _departmentService.FindAllWebApiAsync();
             var viewModel = new SellerFormViewModel { Departments = departments };
             return View(viewModel);
         }
@@ -43,7 +43,7 @@ namespace SalesWebMvc.Controllers
         {
             if (!ModelState.IsValid)
             {
-                List<Department> departmentList = await _departmentService.FindAllAsync();
+                List<Department> departmentList = await _departmentService.FindAllWebApiAsync();
                 SellerFormViewModel viewModel = new SellerFormViewModel
                 {
                     Seller = seller,
@@ -116,7 +116,7 @@ namespace SalesWebMvc.Controllers
                 return RedirectToAction(nameof(Error), new { message = "Id not found." });
             }
 
-            List<Department> departmentList = await _departmentService.FindAllAsync();
+            List<Department> departmentList = await _departmentService.FindAllWebApiAsync();
             SellerFormViewModel viewModel = new SellerFormViewModel
             {
                 Seller = seller,
@@ -132,7 +132,7 @@ namespace SalesWebMvc.Controllers
         {
             if (!ModelState.IsValid)
             {
-                List<Department> departmentList = await _departmentService.FindAllAsync();
+                List<Department> departmentList = await _departmentService.FindAllWebApiAsync();
                 SellerFormViewModel viewModel = new SellerFormViewModel
                 {
                     Seller = seller,

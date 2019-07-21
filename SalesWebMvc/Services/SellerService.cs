@@ -99,7 +99,7 @@ namespace SalesWebMvc.Services
 
             if (!hasAny)
             {
-                throw new NotFoundException("Id not fount.");
+                throw new NotFoundException("Id not found.");
             }
 
             try
@@ -120,7 +120,7 @@ namespace SalesWebMvc.Services
 
             if (!hasAny)
             {
-                throw new NotFoundException("Id not fount.");
+                throw new NotFoundException("Id not found.");
             }
 
             try
