@@ -11,6 +11,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
+using SalesWebMvc.Services.WebApiHelper;
 
 namespace SalesWebMvc
 {
@@ -47,6 +48,8 @@ namespace SalesWebMvc
             services.AddScoped<SellerService>();
             services.AddScoped<DepartmentService>();
             services.AddScoped<SalesRecordService>();
+
+            services.AddSingleton<WebApiClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

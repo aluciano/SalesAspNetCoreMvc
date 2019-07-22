@@ -13,10 +13,17 @@ using System.Threading.Tasks;
 namespace SalesWebMvc.Services
 {
     public class DepartmentService
-    {        
+    {
+        private readonly WebApiClient WebApi;
+
+        public DepartmentService(WebApiClient webApi)
+        {
+            WebApi = webApi;
+        }
+
         public async Task<List<Department>> FindAllWebApiAsync()
         {
-            var response = await new WebApiClient().GetAsync("api/departments");
+            var response = await WebApi.GetAsync("api/departments");
 
             if (response.IsSuccessStatusCode)
             {
@@ -28,7 +35,7 @@ namespace SalesWebMvc.Services
 
         public async Task<Department> FindByIdAsync(int id)
         {
-            var response = await new WebApiClient().GetAsync($"api/departments/{id}");
+            var response = await WebApi.GetAsync($"api/departments/{id}");
 
             if (response.IsSuccessStatusCode)
                 return await response.To<Department>();
@@ -38,17 +45,17 @@ namespace SalesWebMvc.Services
 
         public async Task UpdateAsync(int id, string jsonValues)
         {
-            var response = await new WebApiClient().PutAsync($"api/departments/{id}", jsonValues);
+            var response = await WebApi.PutAsync($"api/departments/{id}", jsonValues);
         }
 
         public async Task InsertAsync(string jsonValues)
         {
-            var response = await new WebApiClient().PostAsync($"api/departments", jsonValues);
+            var response = await WebApi.PostAsync($"api/departments", jsonValues);
         }
 
         public async Task DeleteAsync(int id)
         {
-            var response = await new WebApiClient().DeleteAsync($"api/departments/{id}");
+            var response = await WebApi.DeleteAsync($"api/departments/{id}");
         }        
     }
 }
