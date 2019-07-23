@@ -14,16 +14,16 @@ namespace SalesWebMvc.Controllers
 {
     public class DepartmentsController : Controller
     {
-        private readonly DepartmentService _departmentService;
+        private readonly WebApiService _webApiService;
 
-        public DepartmentsController(DepartmentService departmentService)
+        public DepartmentsController(WebApiService webApiService)
         {
-            _departmentService = departmentService;
+            _webApiService = webApiService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var departments = await _departmentService.FindAllWebApiAsync();
+            var departments = await _webApiService.FindAllAsync<Department>();
 
             return View(departments);
         }
@@ -36,7 +36,7 @@ namespace SalesWebMvc.Controllers
         [HttpGet]
         public async Task<object> GetDepartments(DataSourceLoadOptions loadOptions)
         {
-            var departments = await _departmentService.FindAllWebApiAsync();
+            var departments = await _webApiService.FindAllAsync<Department>();
 
             object result = await Task.Run(() => DataSourceLoader.Load(departments, loadOptions));
 
@@ -48,7 +48,7 @@ namespace SalesWebMvc.Controllers
         {
             try
             {
-                await _departmentService.UpdateAsync(key, values);
+                await _webApiService.UpdateAsync<Department>(key, values);
 
                 return Ok();
             }
@@ -63,7 +63,7 @@ namespace SalesWebMvc.Controllers
         {
             try
             {
-                await _departmentService.InsertAsync(values);
+                await _webApiService.InsertAsync<Department>(values);
 
                 return Ok();
             }
@@ -78,7 +78,7 @@ namespace SalesWebMvc.Controllers
         {
             try
             {
-                await _departmentService.DeleteAsync(key);
+                await _webApiService.DeleteAsync<Department>(key);
 
                 return Ok();
             }
@@ -95,7 +95,7 @@ namespace SalesWebMvc.Controllers
                 return NotFound();
             }
 
-            var department = await _departmentService.FindByIdAsync(id.Value);
+            var department = await _webApiService.FindByIdAsync<Department>(id.Value);
 
             if (department == null)
             {
@@ -117,7 +117,7 @@ namespace SalesWebMvc.Controllers
             if (ModelState.IsValid)
             {
                 string jsonValues = JsonConvert.SerializeObject(department);
-                await _departmentService.InsertAsync(jsonValues);
+                await _webApiService.InsertAsync<Department>(jsonValues);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -131,7 +131,7 @@ namespace SalesWebMvc.Controllers
                 return NotFound();
             }
 
-            var department = await _departmentService.FindByIdAsync(id.Value);
+            var department = await _webApiService.FindByIdAsync<Department>(id.Value);
 
             if (department == null)
             {
@@ -154,7 +154,7 @@ namespace SalesWebMvc.Controllers
                 try
                 {
                     string jsonValues = JsonConvert.SerializeObject(department);
-                    await _departmentService.UpdateAsync(id, jsonValues);
+                    await _webApiService.UpdateAsync<Department>(id, jsonValues);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -174,7 +174,7 @@ namespace SalesWebMvc.Controllers
 
         private async Task<bool> DepartmentExists(int id)
         {
-            var department = await _departmentService.FindByIdAsync(id);
+            var department = await _webApiService.FindByIdAsync<Department>(id);
             return department == null ? false : true;
         }
 
@@ -185,7 +185,7 @@ namespace SalesWebMvc.Controllers
                 return NotFound();
             }
 
-            var department = await _departmentService.FindByIdAsync(id.Value);
+            var department = await _webApiService.FindByIdAsync<Department>(id.Value);
 
             if (department == null)
             {
@@ -199,7 +199,7 @@ namespace SalesWebMvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _departmentService.DeleteAsync(id);
+            await _webApiService.DeleteAsync<Department>(id);
 
             return RedirectToAction(nameof(Index));
         }

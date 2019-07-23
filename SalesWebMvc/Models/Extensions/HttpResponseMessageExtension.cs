@@ -11,10 +11,18 @@ namespace SalesWebMvc.Models.Extensions
     {
         public static async Task<T> To<T>(this HttpResponseMessage response)
         {
-            var webApiEntity = await response.Content.ReadAsStringAsync();
-            var entity = JsonConvert.DeserializeObject<T>(webApiEntity);
+            try
+            {
+                var webApiEntity = await response.Content.ReadAsStringAsync();
 
-            return entity;
+                var entity = JsonConvert.DeserializeObject<T>(webApiEntity);
+
+                return entity;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
     }
 }

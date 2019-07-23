@@ -9,30 +9,28 @@ using SalesWebMvc.Services;
 using SalesWebMvc.Services.Exceptions;
 using DevExtreme.AspNet.Data;
 using DevExtreme.AspNet.Mvc;
+using Newtonsoft.Json;
 
 namespace SalesWebMvc.Controllers
 {
     public class SellersController : Controller
     {
-        private readonly SellerService _sellerService;
-        private readonly DepartmentService _departmentService;
+        private readonly WebApiService _webApiService;
 
-        public SellersController(SellerService sellerService,
-                                 DepartmentService departmentService)
+        public SellersController(WebApiService webApiService)
         {
-            _sellerService = sellerService;
-            _departmentService = departmentService;
+            _webApiService = webApiService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var list = await _sellerService.FindAllAsync();
+            var list = await _webApiService.FindAllAsync<Seller>();
             return View(list);
         }
 
         public async Task<IActionResult> Create()
         {
-            var departments = await _departmentService.FindAllWebApiAsync();
+            var departments = await _webApiService.FindAllAsync<Department>();
             var viewModel = new SellerFormViewModel { Departments = departments };
             return View(viewModel);
         }
@@ -43,7 +41,7 @@ namespace SalesWebMvc.Controllers
         {
             if (!ModelState.IsValid)
             {
-                List<Department> departmentList = await _departmentService.FindAllWebApiAsync();
+                List<Department> departmentList = await _webApiService.FindAllAsync<Department>();
                 SellerFormViewModel viewModel = new SellerFormViewModel
                 {
                     Seller = seller,
@@ -52,7 +50,9 @@ namespace SalesWebMvc.Controllers
                 return View(viewModel);
             }
 
-            await _sellerService.InsertAsync(seller);
+            string jsonValues = JsonConvert.SerializeObject(seller);
+
+            await _webApiService.InsertAsync<Seller>(jsonValues);
             return RedirectToAction(nameof(Index));
         }
 
@@ -63,7 +63,7 @@ namespace SalesWebMvc.Controllers
                 return RedirectToAction(nameof(Error), new { message = "Id not provided." });
             }
 
-            var seller = await _sellerService.FindByIdAsync(id.Value);
+            var seller = await _webApiService.FindByIdAsync<Seller>(id.Value);
             if (seller == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not found." });
@@ -78,7 +78,7 @@ namespace SalesWebMvc.Controllers
         {
             try
             {
-                await _sellerService.RemoveAsync(id);
+                await _webApiService.DeleteAsync<Seller>(id);
                 return RedirectToAction(nameof(Index));
             }
             catch (IntegrityException e)
@@ -94,7 +94,7 @@ namespace SalesWebMvc.Controllers
                 return RedirectToAction(nameof(Error), new { message = "Id not provided." });
             }
 
-            var seller = await _sellerService.FindByIdWithDepartmentAsync(id.Value);
+            var seller = await _webApiService.FindByIdIncludingAsync<Seller>(id.Value, "Department");
             if (seller == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not found." });
@@ -110,13 +110,13 @@ namespace SalesWebMvc.Controllers
                 return RedirectToAction(nameof(Error), new { message = "Id not provided." });
             }
 
-            var seller = await _sellerService.FindByIdWithDepartmentAsync(id.Value);
+            var seller = await _webApiService.FindByIdIncludingAsync<Seller>(id.Value, "Department");
             if (seller == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not found." });
             }
 
-            List<Department> departmentList = await _departmentService.FindAllWebApiAsync();
+            List<Department> departmentList = await _webApiService.FindAllAsync<Department>();
             SellerFormViewModel viewModel = new SellerFormViewModel
             {
                 Seller = seller,
@@ -132,7 +132,7 @@ namespace SalesWebMvc.Controllers
         {
             if (!ModelState.IsValid)
             {
-                List<Department> departmentList = await _departmentService.FindAllWebApiAsync();
+                List<Department> departmentList = await _webApiService.FindAllAsync<Department>();
                 SellerFormViewModel viewModel = new SellerFormViewModel
                 {
                     Seller = seller,
@@ -148,7 +148,9 @@ namespace SalesWebMvc.Controllers
 
             try
             {
-                await _sellerService.UpdateAsync(seller);
+                string jsonValues = JsonConvert.SerializeObject(seller);
+
+                await _webApiService.UpdateAsync<Seller>(id, jsonValues);
                 return RedirectToAction(nameof(Index));
             }
             catch (ApplicationException e)
