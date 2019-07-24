@@ -1,13 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using SalesWebMvc.Models;
+﻿using Newtonsoft.Json;
 using SalesWebMvc.Models.Extensions;
+using SalesWebMvc.Services.ServiceModels;
 using SalesWebMvc.Services.WebApiHelper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace SalesWebMvc.Services
@@ -63,8 +59,32 @@ namespace SalesWebMvc.Services
             }
             catch (Exception e)
             {
-                throw;
+                throw e;
             }
+        }
+
+        public async Task<List<T>> FindByDateAsync<T>(string jsonValues)
+        {
+            var response = await WebApi.GetAsync($"api/{ControllerName<T>()}/{jsonValues}");
+
+            if (response.IsSuccessStatusCode)
+                return await response.To<List<T>>();
+
+            return default;
+        }
+
+        public async Task<List<MyGrouping>> FindByDateGroupingAsync<T>(string jsonValues)
+        {
+            var response = await WebApi.GetAsync($"api/{ControllerName<T>()}/{jsonValues}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var webApiEntity = await response.Content.ReadAsStringAsync();
+
+                return JsonConvert.DeserializeObject<List<MyGrouping>>(webApiEntity);
+            }
+
+            return default;
         }
 
         public async Task UpdateAsync<T>(int id, string jsonValues)

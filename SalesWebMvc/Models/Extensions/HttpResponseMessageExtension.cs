@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -14,14 +12,14 @@ namespace SalesWebMvc.Models.Extensions
             try
             {
                 var webApiEntity = await response.Content.ReadAsStringAsync();
-
+                
                 var entity = JsonConvert.DeserializeObject<T>(webApiEntity);
 
                 return entity;
             }
             catch (Exception e)
             {
-                throw;
+                throw e;
             }
         }
     }

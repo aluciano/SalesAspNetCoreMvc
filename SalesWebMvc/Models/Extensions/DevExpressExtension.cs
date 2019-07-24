@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace SalesWebMvc.Models.Extensions
 {
 
-    static class Extensions
+    static class DevExpressExtension
     {
 
         public static string GetFullErrorMessage(this ModelStateDictionary modelState)

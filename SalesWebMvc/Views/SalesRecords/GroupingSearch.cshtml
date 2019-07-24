@@ -1,4 +1,4 @@
-﻿@model IEnumerable<IGrouping<Department, SalesRecord>>
+﻿@model List<SalesWebMvc.Services.ServiceModels.MyGrouping>
 
 @{
     ViewData["Title"] = "Grouping Search";
@@ -59,7 +59,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in departmentGroup)
+                    @foreach (var item in departmentGroup.Sales)
                     {
                         <tr>
                             <td>
